@@ -103,6 +103,7 @@ fun BottomNavigationBar(navController: NavController, tabBarItems: List<TabBarIt
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
+        color = Color.Gray
     ) {
         NavigationBar {
             tabBarItems.forEachIndexed { index, tabBarItem ->
@@ -145,28 +146,74 @@ fun BottomNavigationBar(navController: NavController, tabBarItems: List<TabBarIt
     }
 }
 
+
+
 @Composable
 fun CardMinimalExample(modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.padding(6.dp)
-            .size(width = 15.dp, height = 750.dp),
-        border = BorderStroke(1.dp, Color.Black),
-        colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
+    val items = listOf(
+        Pair("Brahim", "39"),
+        Pair("Brahim", "39"),
+        Pair("Brahim", "39")
+    )
+
+    Box(modifier = modifier.padding(6.dp)) {
+        // Big card at the bottom
+        BigCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center)
+                .size(width = 300.dp, height = 750.dp)
+
+        )
+
+        // Column with small cards
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(
-                text = "Anas",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp),
-            )
-            Text(
-                text = "Bogos o sla3",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp),
-            )
+            items.forEach { item ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    border = BorderStroke(1.5.dp, Color.Black),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = item.first,
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                        Text(
+                            text = item.second,
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BigCard(modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.padding(6.dp),
+        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
         }
     }
 }

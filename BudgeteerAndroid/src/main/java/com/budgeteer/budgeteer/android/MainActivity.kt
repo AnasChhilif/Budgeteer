@@ -1,6 +1,9 @@
 package com.budgeteer.budgeteer.android
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,12 +34,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.budgeteer.budgeteer.Greeting
+import com.budgeteer.budgeteer.android.services.BudgeteerApiService
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var resultReceiver: BroadcastReceiver
+    var apiResult by mutableStateOf<String?>(null)
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        resultReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                apiResult = intent?.getStringExtra("result")
+                println(apiResult)
+            }
+        }
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
@@ -54,13 +67,10 @@ class MainActivity : ComponentActivity() {
                         BottomNavigationBar(navController, tabBarItems)
                     }
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        GreetingView("Budgeteer")
-                        CardMinimalExample(modifier = Modifier.fillMaxWidth())
-                    }
+                    MyScreen(apiResult = apiResult, onStartService = {
+                        val intent = Intent(this@MainActivity, BudgeteerApiService::class.java)
+                        startService(intent)
+                    })
                 }
             }
         }
@@ -172,13 +182,17 @@ fun CardMinimalExample(modifier: Modifier = Modifier) {
         ) {
             items.forEach { item ->
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
                     border = BorderStroke(1.5.dp, Color.Black),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -214,6 +228,24 @@ fun BigCard(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+        }
+    }
+}
+
+@Composable
+fun MyScreen(apiResult: String?, onStartService: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        GreetingView("Budgeteer")
+        Text(text = apiResult ?: "No data", modifier = Modifier.padding(16.dp))
+        //CardMinimalExample(modifier = Modifier.fillMaxWidth())
+        Button(onClick = onStartService) {
+            Text("Start Service")
+        }
+        apiResult?.let {
+            Text(text = it, modifier = Modifier.padding(16.dp))
         }
     }
 }
